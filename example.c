@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "IniReader.h"
+#include "IniHandler.h"
 
 void print_ini( _ini* );
 
