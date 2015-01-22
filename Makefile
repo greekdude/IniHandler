@@ -1,8 +1,8 @@
 CC	= gcc
-SRC	= IniReader.c
-HDR	= IniReader.h
+SRC	= IniHandler.c
+HDR	= IniHandler.h
 FLAGS	= -c
-NAME	= inireader.o
+NAME	= inihandler.o
 OUTPUT	= -o ${NAME}
 RM	= rm -f
 
