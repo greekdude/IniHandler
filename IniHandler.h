@@ -1,5 +1,5 @@
-#ifndef INIREADER
-#define INIREADER
+#ifndef INIHANDLER
+#define INIHANDLER
 
 #define BUFFER_SIZE	200
 #define STARTGROUP	'['
