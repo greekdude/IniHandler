@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <fcntl.h>
 
 _ini* createIni( char *file ){
 	_ini *config = calloc( 1, sizeof( _ini ) );
@@ -148,25 +149,38 @@ unsigned char saveIni( _ini *config, char *file ){
 	unsigned char rtv = GENERICERROR;
 
 	if( config != NULL  ){
-		FILE *save = fopen( file, "w" );
+		int save = open( file, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
 
-		if( save != NULL ){
+		if( save != -1 ){
 			rtv = GENERICSUCCESS;
 			_inigroup *tmp = config->groups;
 			while( tmp != NULL ){
-				fprintf( save, "[%s]\n", tmp->group_name );
+				unsigned int grp_tmp_size = strlen( tmp->group_name ) + 4;
+				char *grp_tmp = calloc( grp_tmp_size, sizeof(char) );
+				snprintf( grp_tmp, grp_tmp_size, "[%s]\n", tmp->group_name );
+				write( save, grp_tmp, grp_tmp_size - 1 );
 
 				_inielement *pair = tmp->elements;
 				while( pair != NULL ){
-					fprintf( save, "%s=%s\n", pair->key, pair->value );
+					unsigned int pair_tmp_buf_size = strlen( pair->key ) + strlen( pair->value ) + 3;
+					char *pair_tmp = calloc( pair_tmp_buf_size, sizeof(char) );
+					snprintf( pair_tmp, pair_tmp_buf_size, "%s=%s\n", pair->key, pair->value );
+
+					write( save, pair_tmp, pair_tmp_buf_size-1 );
 
 					pair = pair->next;
+
+					free( pair_tmp );
 				}
 
-				fprintf( save, "\n" );
+				write( save, "\n", 1 );
 				tmp = tmp->next;
 			}
+		}else{
+			rtv = GENERICERROR;
 		}
+
+		close( save );
 	}
 
 	return rtv;
