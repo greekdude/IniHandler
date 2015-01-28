@@ -44,6 +44,8 @@ int main( int argc, char *argv[] ){
 	print_ini( config );
 	printf( "\n\n" );
 
+	saveIni( config, "savetest.ini" );
+
 	// frees all data from memory
 	destroyIni( config );
 	config = NULL;
