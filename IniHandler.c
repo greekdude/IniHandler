@@ -369,8 +369,10 @@ unsigned char changeElement( _ini *config, char *group, char *key, char *value )
 
 			if( pair != NULL ){
 				free( pair->value );
-				pair->value = calloc( strlen( value ), sizeof( char ) );
-				strcpy( pair->value, value );
+
+				char *stripped_value = clipWhitespace( value );
+				pair->value = calloc( strlen( stripped_value ), sizeof( char ) );
+				strcpy( pair->value, stripped_value );
 
 				rtv = ELEMENTUPDATED;
 			}

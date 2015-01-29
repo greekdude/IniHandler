@@ -1,6 +1,5 @@
 List of changes, removal and additions I plan on making
 -------------------------------------------------------
 
- * CHANGE: when adding elements, remove leading and trailing whitespace from key and value
  * ADDITION: allow for subgroups : group [Mysql] ; subgroup [Mysql/DbInfo]
 
