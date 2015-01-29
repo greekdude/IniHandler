@@ -1,20 +1,26 @@
 #ifndef INIHANDLER
 #define INIHANDLER
 
-#define BUFFER_SIZE	200
-#define STARTGROUP	'['
-#define CLOSEGROUP	']'
-#define DELIMITER	'='
+// if the buffer max is met, and a newline is not found, the line will not be processed
+// the point of having a threshold is so that the heap can't be filled with junk from one line
+#define BUFFER_SIZE		75
+
+// because we use fgets to grab the data, the actual amount we will grab is (BUFFER_ITERATIVE_THRESHOLD * BUFFER_SIZE) - 1(newline) - BUFFER_ITERATIVE_THRESHOLD (\0 for each iteration)
+#define BUFFER_ITERATIVE_THRESHOLD	4
+
+#define STARTGROUP		'['
+#define CLOSEGROUP		']'
+#define DELIMITER		'='
 
 /* Return Codes */
-#define NOELEMENTFOUND 0
-#define FOUNDELEMENT 1
-#define ELEMENTADDED 2
-#define ELEMENTUPDATED 3
-#define ELEMENTREMOVED 4
-#define GENERICSUCCESS 5
-#define GENERICERROR 6
-#define FAILEDADDELEMENT 7
+#define NOELEMENTFOUND		0
+#define FOUNDELEMENT		1
+#define ELEMENTADDED		2
+#define ELEMENTUPDATED		3
+#define ELEMENTREMOVED		4
+#define GENERICSUCCESS		5
+#define GENERICERROR		6
+#define FAILEDADDELEMENT	7
 
 /* Flag(s) */
 // if set, key's values can be overwritten in merge and add_element
