@@ -3,6 +3,7 @@
 
 // if the buffer max is met, and a newline is not found, the line will not be processed
 // the point of having a threshold is so that the heap can't be filled with junk from one line
+// the buffer will include any whitespace
 #define BUFFER_SIZE		75
 #define BUFFER_ITERATIVE_THRESHOLD	4
 
@@ -74,6 +75,9 @@ unsigned char removeGroup( _ini *config, char *group );
 // adds all elements to config, from second_source.  if a group/key already exists, and OVERWRITE is not set, the value will not be overwritten
 // mergeIni uses add element to add the data
 _ini* mergeIni( _ini *destination, _ini *second_source );
+
+// removes leading and trailing whitespace from key, value and group (inside the [])
+char* clipWhitespace( char *data );
 
 #endif
 
