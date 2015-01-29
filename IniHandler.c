@@ -24,9 +24,23 @@ _ini* createIni( char *file ){
 				char *group = NULL;
 				char *extended_buffer = NULL;
 
-				int no_newline_count = 0;
+				unsigned char no_newline_count = 0;
 				while( fgets( buffer, BUFFER_SIZE, ini_file ) != NULL ){
-					// if the buffer contains a newline or is at eof process data
+					printf( "Newline count: %u\n", no_newline_count );
+					if( no_newline_count >= BUFFER_ITERATIVE_THRESHOLD ){
+						if( strchr( buffer, '\n' ) != NULL || feof( ini_file ) ){
+							if( extended_buffer != buffer ){
+								free( extended_buffer );
+							}
+
+							extended_buffer = NULL;
+							no_newline_count = 0;
+						}
+
+						continue;
+					}
+
+					// if the buffer contains a newline or is at eof, process the data
 					if( strchr( buffer, '\n' ) != NULL || feof( ini_file ) ){
 						if( extended_buffer == NULL ){
 							extended_buffer = buffer;
@@ -114,10 +128,11 @@ _ini* createIni( char *file ){
 
 							strncpy( extended_buffer, buffer, BUFFER_SIZE );
 						}else{
+							printf( "STRING: %s\n", extended_buffer );
 							unsigned int new_size = no_newline_count * BUFFER_SIZE;
 
 							extended_buffer = realloc( extended_buffer, new_size );
-							strncat( extended_buffer, buffer, BUFFER_SIZE );
+							memcpy( extended_buffer + new_size - BUFFER_SIZE - 1, buffer, BUFFER_SIZE );
 						}
 					}
 				}
