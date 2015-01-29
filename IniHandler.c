@@ -16,7 +16,9 @@ _ini* createIni( char *file ){
 			FILE *ini_file = fopen( file, "r" );
 
 			if( ini_file != NULL ){
-				char *buffer = calloc( BUFFER_SIZE, sizeof( char ) );
+				// because fgets appends a \0 at the end, we need to make our buffer size longer for that
+				unsigned int buffer_size = BUFFER_SIZE + 1;
+				char *buffer = calloc( buffer_size, sizeof( char ) );
 				if( buffer == NULL ){
 					exit( EXIT_FAILURE );
 				}
@@ -25,8 +27,7 @@ _ini* createIni( char *file ){
 				char *extended_buffer = NULL;
 
 				unsigned char no_newline_count = 0;
-				while( fgets( buffer, BUFFER_SIZE, ini_file ) != NULL ){
-					printf( "Newline count: %u\n", no_newline_count );
+				while( fgets( buffer, buffer_size, ini_file ) != NULL ){
 					if( no_newline_count >= BUFFER_ITERATIVE_THRESHOLD ){
 						if( strchr( buffer, '\n' ) != NULL || feof( ini_file ) ){
 							if( extended_buffer != buffer ){
@@ -46,7 +47,7 @@ _ini* createIni( char *file ){
 							extended_buffer = buffer;
 						}else{
 							// the extended buffer was used, so now we need to add the new buffer to the extended buffer
-							unsigned int new_size = ( no_newline_count * BUFFER_SIZE ) + strlen( buffer );
+							unsigned int new_size = buffer_size + ( ( no_newline_count - 1 ) * BUFFER_SIZE ) + strlen( buffer );
 
 							extended_buffer = realloc( extended_buffer, new_size );
 							strncat( extended_buffer, buffer, strlen( buffer ) );
@@ -121,18 +122,17 @@ _ini* createIni( char *file ){
 						no_newline_count++;
 
 						if( extended_buffer == NULL ){
-							extended_buffer = calloc( BUFFER_SIZE , sizeof( char ) );
+							extended_buffer = calloc( buffer_size , sizeof( char ) );
 							if( extended_buffer == NULL ){
 								exit( EXIT_FAILURE );
 							}
 
-							strncpy( extended_buffer, buffer, BUFFER_SIZE );
+							strncpy( extended_buffer, buffer, buffer_size );
 						}else{
-							printf( "STRING: %s\n", extended_buffer );
-							unsigned int new_size = no_newline_count * BUFFER_SIZE;
+							unsigned int new_size = ( ( no_newline_count - 1 ) * BUFFER_SIZE ) + buffer_size;
 
 							extended_buffer = realloc( extended_buffer, new_size );
-							memcpy( extended_buffer + new_size - BUFFER_SIZE - 1, buffer, BUFFER_SIZE );
+							strncat( extended_buffer, buffer, strlen( buffer ) );
 						}
 					}
 				}

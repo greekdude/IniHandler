@@ -4,8 +4,6 @@
 // if the buffer max is met, and a newline is not found, the line will not be processed
 // the point of having a threshold is so that the heap can't be filled with junk from one line
 #define BUFFER_SIZE		75
-
-// because we use fgets to grab the data, the actual amount we will grab is (BUFFER_ITERATIVE_THRESHOLD * BUFFER_SIZE) - 1(newline) - BUFFER_ITERATIVE_THRESHOLD (\0 for each iteration)
 #define BUFFER_ITERATIVE_THRESHOLD	4
 
 #define STARTGROUP		'['
