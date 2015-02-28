@@ -79,5 +79,13 @@ _ini* mergeIni( _ini *destination, _ini *second_source );
 // removes leading and trailing whitespace from key, value and group (inside the [])
 char* clipWhitespace( char *data );
 
+unsigned char existsGroup( _ini *config, char *group );
+
+unsigned char existsKey( _ini *config, char *group, char *key );
+
+char* getValue( _ini *config, char *group, char *key );
+
+char** getGroupKeys( char *group );
+
 #endif
 

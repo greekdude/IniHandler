@@ -20,6 +20,7 @@ _ini* createIni( char *file ){
 				unsigned int buffer_size = BUFFER_SIZE + 1;
 				char *buffer = calloc( buffer_size, sizeof( char ) );
 				if( buffer == NULL ){
+					fprintf( stderr, "Error!  Could not allocate space for buffer.\n" );
 					exit( EXIT_FAILURE );
 				}
 
@@ -144,6 +145,7 @@ _ini* createIni( char *file ){
 
 				fclose( ini_file );
 			}else{
+				fprintf( stderr, "Could not find configuration file: %s.\n", file );
 				exit( EXIT_FAILURE );
 			}
 		}
@@ -479,23 +481,29 @@ char* clipWhitespace( char *data ){
 	int start = -1;
 	int end = -1;
 
-	int i;
-	for( i = 0; *(data + i) != '\0'; i++ ){
-		if( start == -1 ){
-			if( ! isspace( *(data + i) )  ){
-				start = i;
-			}
-		}else{
-			if( end == -1 ){
-				if( isspace( *(data + i) ) ){
-					end = i;
+	if( ! (*data == '\t' && strlen( data ) == 1 ) ){
+
+		int i;
+		for( i = 0; *(data + i) != '\0'; i++ ){
+			if( start == -1 ){
+				if( ! isspace( *(data + i) )  ){
+					start = i;
 				}
 			}else{
-				if( ! isspace( *(data + i) ) ){
-					end = -1;
+				if( end == -1 ){
+					if( isspace( *(data + i) ) ){
+						end = i;
+					}
+				}else{
+					if( ! isspace( *(data + i) ) ){
+						end = -1;
+					}
 				}
 			}
 		}
+	}else{
+		start = 0;
+		end = 1;
 	}
 
 	if( end == -1 ){
@@ -512,5 +520,82 @@ char* clipWhitespace( char *data ){
 	}
 
 	return stripped;
+}
+
+unsigned char existsGroup( _ini *config, char *group ){
+	unsigned char rtv = 0;
+
+	_inigroup *tmp = config->groups;
+
+	while( tmp != NULL ){
+		if( strcmp( tmp->group_name, group ) == 0 ){
+			rtv = 1;
+			break;
+		}
+
+		tmp = tmp->next;
+	}
+
+	return rtv;
+}
+
+unsigned char existsKey( _ini *config, char *group, char *key ){
+	unsigned char rtv = 0;
+
+	_inigroup *tmp = config->groups;
+
+	while( tmp != NULL ){
+		if( strcmp( tmp->group_name, group ) == 0 ){
+			_inielement *prev_pair = NULL;
+			_inielement *pair = tmp->elements;
+			while( pair != NULL ){
+				if( strcmp( pair->key, key ) == 0 ){
+					rtv = 1;
+					break;
+				}
+
+				prev_pair = pair;
+				pair = pair->next;
+			}
+
+			break;
+		}
+
+		tmp = tmp->next;
+	}
+
+	return rtv;
+}
+
+char* getValue( _ini *config, char *group, char *key ){
+	char *rtv = NULL;
+
+	_inigroup *tmp = config->groups;
+
+	while( tmp != NULL ){
+		if( strcmp( tmp->group_name, group ) == 0 ){
+			_inielement *prev_pair = NULL;
+			_inielement *pair = tmp->elements;
+			while( pair != NULL ){
+				if( strcmp( pair->key, key ) == 0 ){
+					rtv = pair->value;
+					break;
+				}
+
+				prev_pair = pair;
+				pair = pair->next;
+			}
+
+			break;
+		}
+
+		tmp = tmp->next;
+	}
+
+	return rtv;
+}
+
+char** getGroupKeys( char *group ){
+	return NULL;
 }
 
