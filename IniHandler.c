@@ -139,10 +139,12 @@ _ini* createIni( char *file ){
 					}
 				}
 
-				if( group ){
+				if( group != NULL ){
 					free( group );
 					group = NULL;
 				}
+
+				free( buffer );
 
 				fclose( ini_file );
 			}else{
@@ -226,7 +228,7 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 		tmp_group_name = calloc( strlen( group ) + 1, sizeof( char ) );
 		strcpy( tmp_group_name, group );
 	}else{
-		tmp_group_name = calloc( 7, sizeof( char ) );
+		tmp_group_name = calloc( 8, sizeof( char ) );
 		strcpy( tmp_group_name, "General" );
 	}
 
@@ -342,6 +344,8 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 		strcpy( current_group->elements->value, value );
 		rtv = ELEMENTADDED;
 	}
+
+	free( tmp_group_name );
 
 	return rtv;
 }
