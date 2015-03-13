@@ -59,7 +59,7 @@ _ini* createIni( char *file ){
 							// save group name
 							if( *extended_buffer == STARTGROUP ){
 								ptrdiff_t group_size = ( ptrdiff_t )( strrchr( extended_buffer, CLOSEGROUP ) - extended_buffer );
-								group = calloc( group_size, sizeof( char ) );
+								group = calloc( group_size + 1, sizeof( char ) );
 								if( group == NULL ){
 									exit( EXIT_FAILURE );
 								}
@@ -222,23 +222,19 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 
 	// if a group is not passed, it will default to General
 	if( group != NULL ){
-		tmp_group_name = calloc( strlen( group ), sizeof( char ) );
+		tmp_group_name = calloc( strlen( group ) + 1, sizeof( char ) );
 		strcpy( tmp_group_name, group );
 	}else{
 		tmp_group_name = calloc( 7, sizeof( char ) );
 		strcpy( tmp_group_name, "General" );
 	}
 
-	char *stripped_group = clipWhitespace( tmp_group_name );
-	char *stripped_key = clipWhitespace( key );
-	char *stripped_value = clipWhitespace( value );
-
 	_inigroup *tmp_group = config->groups;
 	_inigroup *prev_group = config->groups;
 
 	char group_exists = 0;
 	while( tmp_group != NULL ){
-		if( strcmp( tmp_group->group_name, stripped_group ) != 0 ){
+		if( strcmp( tmp_group->group_name, tmp_group_name ) != 0 ){
 			prev_group = tmp_group;
 			tmp_group = tmp_group->next;
 		}else{
@@ -249,7 +245,7 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 
 			char element_exists = 0;
 			while( current_element != NULL ){
-				if( strcmp( stripped_key, current_element->key ) == 0 ){
+				if( strcmp( key, current_element->key ) == 0 ){
 					element_exists = 1;
 					break;
 				}
@@ -265,31 +261,31 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 					exit( EXIT_FAILURE );
 				}
 
-				current_element->key = calloc( strlen( stripped_key ), sizeof( char ) );
+				current_element->key = calloc( strlen( key ) + 1, sizeof( char ) );
 				if( current_element->key == NULL ){
 					exit( EXIT_FAILURE );
 				}
 
-				strcpy( current_element->key, stripped_key );
+				strcpy( current_element->key, key );
 
-				current_element->value = calloc( strlen( stripped_value ), sizeof( char ) );
+				current_element->value = calloc( strlen( value ) + 1, sizeof( char ) );
 				if( current_element->value == NULL ){
 					exit( EXIT_FAILURE );
 				}
 
 				current_element->next = NULL;
 
-				strcpy( current_element->value, stripped_value );
+				strcpy( current_element->value, value );
 				rtv = ELEMENTADDED;
 			}else if( (config->flags & OVERWRITE) ){
-				if( strcmp( stripped_value, current_element->value ) ){
+				if( strcmp( value, current_element->value ) ){
 					free( current_element->value );
-					current_element->value = calloc( strlen( stripped_value ), sizeof( char ) );
+					current_element->value = calloc( strlen( value ), sizeof( char ) );
 					if( current_element->value == NULL ){
 						exit( EXIT_FAILURE );
 					}
 
-					strcpy( current_element->value, stripped_value );
+					strcpy( current_element->value, value );
 					rtv = ELEMENTADDED;
 				}
 			}else{
@@ -317,12 +313,12 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 			current_group = config->groups;
 		}
 
-		current_group->group_name = calloc( strlen(stripped_group), sizeof( char ) );
+		current_group->group_name = calloc( strlen(tmp_group_name) + 1, sizeof( char ) );
 		if( current_group->group_name == NULL ){
 			exit( EXIT_FAILURE );
 		}
 
-		strcpy( current_group->group_name, stripped_group );
+		strcpy( current_group->group_name, tmp_group_name );
 
 		current_group->elements = calloc( 1, sizeof( _inielement ) );
 		if( current_group->elements == NULL ){
@@ -330,19 +326,19 @@ unsigned char addElement( _ini* config, char* group, char* key, char *value ){
 		}
 
 		current_group->elements->next = NULL;
-		current_group->elements->key = calloc( strlen( stripped_key ), sizeof( char ) );
+		current_group->elements->key = calloc( strlen( key ) + 1, sizeof( char ) );
 		if( current_group->elements->key == NULL ){
 			exit( EXIT_FAILURE );
 		}
 
-		strcpy( current_group->elements->key, stripped_key );
+		strcpy( current_group->elements->key, key );
 
-		current_group->elements->value = calloc( strlen( stripped_value ), sizeof( char ) );
+		current_group->elements->value = calloc( strlen( value ) + 1, sizeof( char ) );
 		if( current_group->elements->value == NULL ){
 			exit( EXIT_FAILURE );
 		}
 
-		strcpy( current_group->elements->value, stripped_value );
+		strcpy( current_group->elements->value, value );
 		rtv = ELEMENTADDED;
 	}
 
@@ -372,9 +368,8 @@ unsigned char changeElement( _ini *config, char *group, char *key, char *value )
 			if( pair != NULL ){
 				free( pair->value );
 
-				char *stripped_value = clipWhitespace( value );
-				pair->value = calloc( strlen( stripped_value ), sizeof( char ) );
-				strcpy( pair->value, stripped_value );
+				pair->value = calloc( strlen( value ) + 1, sizeof( char ) );
+				strcpy( pair->value, value );
 
 				rtv = ELEMENTUPDATED;
 			}
@@ -475,51 +470,6 @@ _ini* mergeIni( _ini *destination, _ini *second_source ){
 	}
 
 	return destination;
-}
-
-char* clipWhitespace( char *data ){
-	int start = -1;
-	int end = -1;
-
-	if( ! (*data == '\t' && strlen( data ) == 1 ) ){
-
-		int i;
-		for( i = 0; *(data + i) != '\0'; i++ ){
-			if( start == -1 ){
-				if( ! isspace( *(data + i) )  ){
-					start = i;
-				}
-			}else{
-				if( end == -1 ){
-					if( isspace( *(data + i) ) ){
-						end = i;
-					}
-				}else{
-					if( ! isspace( *(data + i) ) ){
-						end = -1;
-					}
-				}
-			}
-		}
-	}else{
-		start = 0;
-		end = 1;
-	}
-
-	if( end == -1 ){
-		end = strlen( data );
-	}
-
-	char* stripped = NULL;
-
-	if( start != -1 ){
-		int length = end - start;
-
-		stripped = calloc( length, sizeof( char ) );
-		memmove( stripped, (data + start), length );
-	}
-
-	return stripped;
 }
 
 unsigned char existsGroup( _ini *config, char *group ){
