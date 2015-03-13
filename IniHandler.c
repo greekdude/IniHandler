@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 _ini* createIni( char *file ){
 	_ini *config = calloc( 1, sizeof( _ini ) );
@@ -353,7 +354,6 @@ unsigned char changeElement( _ini *config, char *group, char *key, char *value )
 
 	while( tmp != NULL ){
 		if( strcmp( tmp->group_name, group ) == 0 ){
-			_inielement *prev_pair = NULL;
 			_inielement *pair = tmp->elements;
 			while( pair != NULL ){
 				if( strcmp( pair->key, key ) == 0 ){
@@ -361,7 +361,6 @@ unsigned char changeElement( _ini *config, char *group, char *key, char *value )
 					break;
 				}
 
-				prev_pair = pair;
 				pair = pair->next;
 			}
 
@@ -496,7 +495,6 @@ unsigned char existsKey( _ini *config, char *group, char *key ){
 
 	while( tmp != NULL ){
 		if( strcmp( tmp->group_name, group ) == 0 ){
-			_inielement *prev_pair = NULL;
 			_inielement *pair = tmp->elements;
 			while( pair != NULL ){
 				if( strcmp( pair->key, key ) == 0 ){
@@ -504,7 +502,6 @@ unsigned char existsKey( _ini *config, char *group, char *key ){
 					break;
 				}
 
-				prev_pair = pair;
 				pair = pair->next;
 			}
 
@@ -524,7 +521,6 @@ char* getValue( _ini *config, char *group, char *key ){
 
 	while( tmp != NULL ){
 		if( strcmp( tmp->group_name, group ) == 0 ){
-			_inielement *prev_pair = NULL;
 			_inielement *pair = tmp->elements;
 			while( pair != NULL ){
 				if( strcmp( pair->key, key ) == 0 ){
@@ -532,7 +528,6 @@ char* getValue( _ini *config, char *group, char *key ){
 					break;
 				}
 
-				prev_pair = pair;
 				pair = pair->next;
 			}
 
