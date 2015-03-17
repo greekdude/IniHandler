@@ -60,8 +60,14 @@ _ini* createIni( char *file ){
 							// save group name
 							if( *extended_buffer == STARTGROUP ){
 								ptrdiff_t group_size = ( ptrdiff_t )( strrchr( extended_buffer, CLOSEGROUP ) - extended_buffer );
+								if( group != NULL ){
+									free( group );
+									group = NULL;
+								}
+
 								group = calloc( group_size + 1, sizeof( char ) );
 								if( group == NULL ){
+									fprintf( stderr, "Group is null.\n" );
 									exit( EXIT_FAILURE );
 								}
 
