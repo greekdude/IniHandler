@@ -1,14 +1,15 @@
 CC	= gcc
 SRC	= IniHandler.c
 HDR	= IniHandler.h
+BLD	= bld/
 FLAGS	= -c
-NAME	= inihandler.o
-OUTPUT	= -o ${NAME}
+NAME	= IniHandler.o
+OUTPUT	= -o ${BLD}${NAME}
 RM	= rm -f
 
-all: ${HDR} ${SRC}
+all:
 	${CC} ${FLAGS} ${OUTPUT} ${SRC}
 
 clean:
-	${RM} ${NAME}
+	${RM} ${BLD}${NAME}
 
